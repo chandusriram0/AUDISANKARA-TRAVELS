@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audisankara Travels | AI Smart Travel Planner</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--primary:#0f766e;--secondary:#2563eb;--accent:#f59e0b;--dark:#0f172a;--muted:#64748b;--light:#f8fafc;--border:#e2e8f0;--card:#fff;--success:#059669}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,#ecfeff,#eff6ff,#f5f3ff);color:var(--dark);min-height:100vh}
+header{background:linear-gradient(135deg,#064e3b,#0f766e,#2563eb);color:#fff;padding:18px 6%;position:sticky;top:0;z-index:20;box-shadow:0 8px 30px #0002}
+.nav{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{font-size:22px;font-weight:900}.logo span{font-size:27px}
+.nav small{opacity:.9}.badge{background:#ffffff20;border:1px solid #ffffff45;padding:8px 13px;border-radius:999px;font-size:12px}
+main{max-width:1200px;margin:38px auto;padding:0 20px}
+.hero{text-align:center;margin-bottom:28px}.hero .brand{display:inline-block;background:#fff;border:1px solid var(--border);padding:8px 15px;border-radius:999px;color:#0f766e;font-weight:800;margin-bottom:14px}.hero h1{font-size:clamp(34px,6vw,58px);line-height:1.05;margin-bottom:14px}.hero h1 span{background:linear-gradient(90deg,#0f766e,#2563eb);color:transparent;background-clip:text}.hero p{color:var(--muted);font-size:17px;max-width:760px;margin:auto}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:25px 0}.quick div{background:#ffffffcc;border:1px solid var(--border);border-radius:16px;padding:15px;text-align:center}.quick b{display:block;margin-top:5px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:24px;padding:28px;box-shadow:0 20px 50px #1e293b12}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.field label{display:block;font-weight:750;font-size:14px;margin-bottom:8px}.field input,.field select{width:100%;padding:13px 14px;border:1px solid #cbd5e1;border-radius:12px;font-size:15px;outline:none;background:#fff}.field input:focus,.field select:focus{border-color:var(--secondary);box-shadow:0 0 0 3px #2563eb18}.full{grid-column:1/-1}
+.interests{display:flex;flex-wrap:wrap;gap:10px}.interest{position:relative}.interest input{display:none}.interest label{display:block;padding:10px 14px;border:1px solid #cbd5e1;border-radius:999px;cursor:pointer;color:#475569;background:#fff;transition:.2s}.interest input:checked+label{background:#ecfdf5;border-color:#10b981;color:#047857;font-weight:700}
+.btn{border:0;border-radius:13px;padding:14px 22px;font-size:16px;font-weight:800;cursor:pointer;transition:.2s}.btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px #2563eb30}.btn-primary{background:linear-gradient(90deg,#0f766e,#2563eb);color:#fff;width:100%;margin-top:22px}
+#results{display:none;margin-top:30px}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}.stat{background:#fff;border:1px solid var(--border);padding:18px;border-radius:18px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:21px;margin-top:5px}.green{color:var(--success)}
+.result-grid{display:grid;grid-template-columns:2fr 1fr;gap:20px}.card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:22px;box-shadow:0 10px 35px #1e293b0c}.card h2{font-size:20px;margin-bottom:16px}.day{border:1px solid var(--border);border-radius:16px;padding:17px;margin-bottom:14px}.day-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.day-title h3{font-size:17px}.day-title span{font-size:12px;background:#ecfdf5;color:#047857;padding:6px 9px;border-radius:999px}.activity{display:flex;gap:12px;padding:10px 0;border-bottom:1px dashed #e2e8f0}.activity:last-child{border-bottom:0}.time{font-weight:800;color:#2563eb;min-width:75px}.cost{margin-left:auto;font-weight:700;white-space:nowrap}.side-list{list-style:none}.side-list li{padding:10px 0;border-bottom:1px solid #eef2f7}.side-list li:last-child{border:0}
+.chat{margin-top:20px}.chatbox{display:flex;gap:8px}.chatbox input{flex:1;padding:12px;border:1px solid #cbd5e1;border-radius:11px}.chat-answer{margin-top:12px;background:#f8fafc;padding:12px;border-radius:12px;color:#475569;display:none}
+.loader{text-align:center;padding:30px;display:none}.spinner{width:42px;height:42px;border:4px solid #e2e8f0;border-top-color:#0f766e;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}@keyframes spin{to{transform:rotate(360deg)}}
+footer{text-align:center;color:#64748b;padding:35px 20px;font-size:13px}.footer-brand{font-weight:900;color:#0f766e}
+@media(max-width:800px){.form-grid,.result-grid{grid-template-columns:1fr}.summary,.quick{grid-template-columns:repeat(2,1fr)}.full{grid-column:auto}}
+@media(max-width:480px){main{margin-top:25px}.panel{padding:18px;border-radius:18px}.summary,.quick{grid-template-columns:1fr}.hero h1{font-size:38px}.nav small{display:none}.activity{flex-wrap:wrap}.cost{margin-left:0}}
+</style>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <div class="logo"><span>🚌</span> Audisankara Travels</div>
+    <div><small>AI Smart Travel Planner</small> &nbsp; <span class="badge">Plan • Explore • Travel</span></div>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="brand">✈️ Audisankara Travels presents</div>
+  <h1>Travel smarter with <span>AI</span></h1>
+  <p>Create a personalized journey with an itinerary, budget estimate, activities, packing list and smart travel recommendations.</p>
+</section>
+
+<div class="quick">
+  <div>🤖<b>AI Itinerary</b><small>Personalized plans</small></div>
+  <div>💰<b>Budget Planner</b><small>Control spending</small></div>
+  <div>🎒<b>Packing Assistant</b><small>Never forget essentials</small></div>
+  <div>🛡️<b>Travel Safety</b><small>Smart reminders</small></div>
+</div>
+
+<section class="panel">
+  <div class="form-grid">
+    <div class="field"><label>📍 Destination</label><input id="destination" placeholder="e.g. Tirupati, Goa, Hyderabad" value="Tirupati"></div>
+    <div class="field"><label>💰 Total Budget (₹)</label><input id="budget" type="number" min="1000" value="15000"></div>
+    <div class="field"><label>📅 Start Date</label><input id="startDate" type="date"></div>
+    <div class="field"><label>📅 End Date</label><input id="endDate" type="date"></div>
+    <div class="field"><label>👥 Travelers</label><input id="travelers" type="number" min="1" value="2"></div>
+    <div class="field"><label>🚌 Transport</label><select id="transport"><option>Bus</option><option>Car</option><option>Train</option><option>Flight</option></select></div>
+    <div class="field"><label>🏨 Stay Preference</label><select id="stay"><option>Budget</option><option selected>Comfort</option><option>Luxury</option></select></div>
+    <div class="field"><label>🍽️ Food Preference</label><select id="foodPref"><option>Local food</option><option>Vegetarian</option><option>Mixed</option><option>Premium dining</option></select></div>
+    <div class="field full">
+      <label>❤️ Interests</label>
+      <div class="interests">
+        <div class="interest"><input id="temples" type="checkbox" checked><label for="temples">🛕 Temples</label></div>
+        <div class="interest"><input id="beach" type="checkbox"><label for="beach">🏖️ Beaches</label></div>
+        <div class="interest"><input id="food" type="checkbox" checked><label for="food">🍜 Food</label></div>
+        <div class="interest"><input id="adventure" type="checkbox"><label for="adventure">🧗 Adventure</label></div>
+        <div class="interest"><input id="history" type="checkbox"><label for="history">🏛️ History</label></div>
+        <div class="interest"><input id="shopping" type="checkbox"><label for="shopping">🛍️ Shopping</label></div>
+        <div class="interest"><input id="nature" type="checkbox"><label for="nature">🌿 Nature</label></div>
+        <div class="interest"><input id="family" type="checkbox"><label for="family">👨‍👩‍👧 Family</label></div>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="generateTrip()">✨ Generate My Audisankara AI Trip</button>
+</section>
+
+<div class="loader" id="loader"><div class="spinner"></div><b>Audisankara AI is creating your journey...</b><p style="color:#64748b;margin-top:6px">Analyzing destination, budget, interests and schedule</p></div>
+
+<section id="results">
+  <div class="summary">
+    <div class="stat"><small>📍 Destination</small><strong id="rDestination">-</strong></div>
+    <div class="stat"><small>💰 Estimated Cost</small><strong id="rCost">-</strong></div>
+    <div class="stat"><small>💵 Remaining Budget</small><strong id="rRemaining">-</strong></div>
+    <div class="stat"><small>📅 Duration</small><strong id="rDays">-</strong></div>
+  </div>
+
+  <div class="result-grid">
+    <div class="card">
+      <h2>🗓️ Your Personalized Itinerary</h2>
+      <div id="itinerary"></div>
+    </div>
+    <div>
+      <div class="card"><h2>🎒 Smart Packing List</h2><ul class="side-list" id="packing"></ul></div>
+      <div class="card" style="margin-top:20px"><h2>🛡️ Travel Safety Tips</h2><ul class="side-list" id="safety"></ul></div>
+      <div class="card" style="margin-top:20px"><h2>💡 AI Recommendations</h2><ul class="side-list" id="recommendations"></ul></div>
+      <div class="card chat">
+        <h2>🤖 Audisankara Travel AI</h2>
+        <div class="chatbox"><input id="question" placeholder="Ask about your trip..."><button class="btn" style="background:#111827;color:#fff" onclick="askAI()">Ask</button></div>
+        <div id="answer" class="chat-answer"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><span class="footer-brand">Audisankara Travels</span> • AI Smart Travel Planner • Hackathon MVP</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+
+function setDefaultDates(){
+  const now=new Date(), end=new Date(now); end.setDate(now.getDate()+2);
+  $("startDate").value=now.toISOString().slice(0,10);
+  $("endDate").value=end.toISOString().slice(0,10);
+}
+setDefaultDates();
+
+function getDays(){
+  const s=new Date($("startDate").value),e=new Date($("endDate").value);
+  return Math.max(1,Math.ceil((e-s)/86400000)+1);
+}
+function getInterests(){
+  return ["temples","beach","food","adventure","history","shopping","nature","family"].filter(x=>$(x).checked);
+}
+function generateTrip(){
+  const destination=$("destination").value.trim()||"Tirupati";
+  const budget=Number($("budget").value)||15000;
+  const travelers=Number($("travelers").value)||2;
+  const days=getDays();
+  if(new Date($("endDate").value)<new Date($("startDate").value)){alert("End date must be after start date.");return}
+  $("results").style.display="none";$("loader").style.display="block";
+  setTimeout(()=>{
+    const interests=getInterests();
+    const estimated=Math.round(Math.min(budget*.96,Math.max(budget*.62,budget*.80+travelers*300+days*220)));
+    const remaining=budget-estimated;
+    $("rDestination").textContent=destination;$("rCost").textContent=money(estimated);
+    $("rRemaining").textContent=money(remaining);$("rRemaining").className=remaining>=0?"green":"";
+    $("rDays").textContent=days+" day"+(days===1?"":"s");
+
+    const acts=buildActivities(destination,interests);
+    let out="";
+    for(let d=1;d<=days;d++){
+      const dc=Math.round(estimated/days), arr=acts[(d-1)%acts.length];
+      out+=`<div class="day"><div class="day-title"><h3>Day ${d} — ${d===1?"Arrival & Exploration":d===days?"Final Experiences":"Discover & Enjoy"}</h3><span>${money(dc)}</span></div>
+      ${arr.map(a=>`<div class="activity"><div class="time">${a.time}</div><div>${a.icon} <b>${a.name}</b><div style="color:#64748b;font-size:13px">${a.note}</div></div><div class="cost">${a.cost}</div></div>`).join("")}</div>`;
+    }
+    $("itinerary").innerHTML=out;
+
+    let packing=["Government ID / tickets","Phone + charger + power bank","Comfortable walking shoes","Basic medicines","Reusable water bottle","Emergency contact details"];
+    if(interests.includes("beach"))packing.push("Swimwear & quick-dry towel","Sunscreen & sunglasses");
+    if(interests.includes("temples"))packing.push("Modest/traditional clothing");
+    if(interests.includes("adventure"))packing.push("Sportswear & extra water");
+    if(interests.includes("nature"))packing.push("Insect repellent");
+    $("packing").innerHTML=packing.map(x=>`<li>☑️ ${x}</li>`).join("");
+
+    const safety=["Keep valuables secure in crowded places.","Share your itinerary and emergency contact with family.","Carry digital and physical copies of important documents.","Check local weather and road conditions before departure.","Use trusted transport and verify booking details."];
+    $("safety").innerHTML=safety.map(x=>`<li>🛡️ ${x}</li>`).join("");
+
+    const recs=[`Keep 10–15% of your budget as an emergency reserve.`,`Choose accommodation close to your main sightseeing areas.`,`Book major transport and stays early when possible.`,`Keep one flexible time slot each day for unexpected discoveries.`];
+    if($("transport").value==="Bus")recs.unshift("Audisankara Travels tip: compare departure times and choose a convenient boarding point.");
+    if($("stay").value==="Luxury")recs.unshift("Luxury plan: compare hotel packages that include breakfast or transfers.");
+    $("recommendations").innerHTML=recs.map(x=>`<li>💡 ${x}</li>`).join("");
+
+    $("loader").style.display="none";$("results").style.display="block";
+    window.scrollTo({top:$("results").offsetTop-70,behavior:"smooth"});
+  },1100);
+}
+function buildActivities(destination,i){
+  const has=x=>i.includes(x);
+  const special=has("temples")?{icon:"🛕",name:"Temple / spiritual visit",note:`Visit a popular temple or spiritual attraction around ${destination}.`,cost:"₹100–500"}:
+  has("beach")?{icon:"🏖️",name:"Beach & scenic experience",note:"Relax, explore and take photos.",cost:"₹0–500"}:
+  has("nature")?{icon:"🌿",name:"Nature exploration",note:"Enjoy a scenic outdoor location.",cost:"₹100–500"}:
+  {icon:"📸",name:"City sightseeing",note:"Explore a popular local attraction.",cost:"₹100–500"};
+  const activity=has("adventure")?{icon:"🧗",name:"Adventure activity",note:"Choose an activity suited to your group.",cost:"₹500–1,500"}:
+  has("history")?{icon:"🏛️",name:"Historical attraction",note:"Discover local culture and history.",cost:"₹100–500"}:
+  has("shopping")?{icon:"🛍️",name:"Local shopping",note:"Explore local markets and souvenirs.",cost:"₹200–1,000"}:
+  {icon:"🗺️",name:"Explore the destination",note:"Discover a nearby attraction.",cost:"₹0–500"};
+  const food={icon:"🍜",name:"Local food experience",note:`Enjoy ${$("foodPref").value.toLowerCase()} and regional specialties.`,cost:"₹300–700"};
+  const base=[
+    {time:"08:00 AM",icon:"☕",name:"Breakfast & day briefing",note:"Start the day and review your route.",cost:"₹200–400"},
+    {time:"10:00 AM",...special},
+    {time:"01:00 PM",...food},
+    {time:"03:30 PM",...activity},
+    {time:"06:30 PM",icon:"🌅",name:"Relax / sunset time",note:"Free time for photos and relaxation.",cost:"₹0–300"},
+    {time:"08:00 PM",icon:"🍽️",name:"Dinner & local experience",note:"Choose a convenient restaurant near your stay.",cost:"₹400–800"}
+  ];
+  return [base,base.map((x,idx)=>({...x,time:["08:30 AM","10:30 AM","01:30 PM","04:00 PM","06:45 PM","08:30 PM"][idx]})),base.slice().reverse()];
+}
+function askAI(){
+  const q=$("question").value.trim();if(!q)return;
+  const destination=$("destination").value||"your destination",l=q.toLowerCase();let a=`For ${destination}, keep your schedule flexible, carry your essential documents, check weather conditions, and reserve part of your budget for unexpected expenses.`;
+  if(l.includes("budget"))a="Use a simple budget split: accommodation 30–35%, transport 20–25%, food 15–20%, activities 10–15%, and keep the rest as a safety reserve.";
+  else if(l.includes("pack"))a="Pack ID, tickets, charger, power bank, comfortable footwear, medicines, weather-appropriate clothes and destination-specific items.";
+  else if(l.includes("safe"))a="Stay in well-known areas, keep valuables secure, use trusted transport, share your itinerary with family and save emergency contacts.";
+  else if(l.includes("food"))a="Try regional specialties and local restaurants with good hygiene. Ask for recommendations from your hotel or trusted local sources.";
+  $("answer").textContent=a;$("answer").style.display="block";
+}
+</script>
+</body>
+</html>
