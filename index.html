@@ -26,13 +26,62 @@ main{max-width:1200px;margin:38px auto;padding:0 20px}
 footer{text-align:center;color:#64748b;padding:35px 20px;font-size:13px}.footer-brand{font-weight:900;color:#0f766e}
 @media(max-width:800px){.form-grid,.result-grid{grid-template-columns:1fr}.summary,.quick{grid-template-columns:repeat(2,1fr)}.full{grid-column:auto}}
 @media(max-width:480px){main{margin-top:25px}.panel{padding:18px;border-radius:18px}.summary,.quick{grid-template-columns:1fr}.hero h1{font-size:38px}.nav small{display:none}.activity{flex-wrap:wrap}.cost{margin-left:0}}
+
+/* Customer OTP Login */
+#loginOverlay{position:fixed;inset:0;background:linear-gradient(135deg,#064e3bee,#2563ebee);display:flex;align-items:center;justify-content:center;padding:20px;z-index:1000}
+.login-card{width:min(430px,100%);background:#fff;border-radius:24px;padding:30px;box-shadow:0 25px 80px #0005}
+.login-brand{text-align:center;font-size:25px;font-weight:900;color:#0f766e;margin-bottom:8px}
+.login-sub{text-align:center;color:#64748b;margin-bottom:24px}
+.login-card .field{margin-bottom:16px}
+.otp-row{display:flex;gap:10px}
+.otp-row input{flex:1}
+#otpSection{display:none}
+#otpHint{font-size:13px;color:#64748b;margin-top:8px}
+.login-error{display:none;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;padding:10px;border-radius:10px;margin-top:12px;font-size:13px}
+.login-success{display:none;color:#047857;background:#ecfdf5;border:1px solid #a7f3d0;padding:10px;border-radius:10px;margin-top:12px;font-size:13px}
+.user-badge{display:none;background:#ffffff22;border:1px solid #ffffff55;padding:8px 13px;border-radius:999px;font-size:12px}
+
 </style>
 </head>
 <body>
+
+<!-- Customer Login / OTP Verification -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="login-brand">🚌 Audisankara Travels</div>
+    <p class="login-sub">Customer Login & Mobile Verification</p>
+
+    <div class="field">
+      <label>📱 Mobile Number</label>
+      <input id="loginMobile" type="tel" inputmode="numeric" maxlength="10"
+             placeholder="Enter 10-digit mobile number">
+    </div>
+
+    <button id="sendOtpBtn" class="btn btn-primary" onclick="sendOTP()">Send OTP</button>
+
+    <div id="otpSection">
+      <div class="field" style="margin-top:16px">
+        <label>🔐 Enter OTP</label>
+        <div class="otp-row">
+          <input id="loginOtp" type="text" inputmode="numeric" maxlength="6"
+                 placeholder="6-digit OTP">
+          <button class="btn" style="background:#111827;color:#fff" onclick="verifyOTP()">Verify</button>
+        </div>
+        <div id="otpHint">Demo OTP will be generated for this prototype.</div>
+      </div>
+      <button class="btn" style="width:100%;background:#e2e8f0;color:#0f172a"
+              onclick="sendOTP()">Resend OTP</button>
+    </div>
+
+    <div id="loginError" class="login-error"></div>
+    <div id="loginSuccess" class="login-success"></div>
+  </div>
+</div>
+
 <header>
   <div class="nav">
     <div class="logo"><span>🚌</span> Audisankara Travels</div>
-    <div><small>AI Smart Travel Planner</small> &nbsp; <span class="badge">Plan • Explore • Travel</span></div>
+    <div><small>AI Smart Travel Planner</small> &nbsp; <span id="userBadge" class="user-badge"></span> <span class="badge">Plan • Explore • Travel</span></div>
   </div>
 </header>
 
@@ -112,12 +161,67 @@ footer{text-align:center;color:#64748b;padding:35px 20px;font-size:13px}.footer-
 const $=id=>document.getElementById(id);
 const money=n=>"₹"+Math.round(n).toLocaleString("en-IN");
 
+
+let generatedOTP = "";
+let verifiedMobile = "";
+
+function showLoginMessage(id, message){
+  $("loginError").style.display="none";
+  $("loginSuccess").style.display="none";
+  $(id).textContent=message;
+  $(id).style.display="block";
+}
+
+function sendOTP(){
+  const mobile=$("loginMobile").value.trim();
+  $("loginError").style.display="none";
+  $("loginSuccess").style.display="none";
+
+  if(!/^[6-9]\d{9}$/.test(mobile)){
+    showLoginMessage("loginError","Please enter a valid 10-digit Indian mobile number.");
+    return;
+  }
+
+  generatedOTP=String(Math.floor(100000+Math.random()*900000));
+  $("otpSection").style.display="block";
+  $("loginOtp").value="";
+  $("otpHint").textContent="Demo OTP: "+generatedOTP+" (real SMS requires an SMS/OTP service)";
+  showLoginMessage("loginSuccess","OTP generated successfully. Enter the OTP to continue.");
+}
+
+function verifyOTP(){
+  const mobile=$("loginMobile").value.trim();
+  const otp=$("loginOtp").value.trim();
+
+  if(otp!==generatedOTP){
+    showLoginMessage("loginError","Invalid OTP. Please enter the correct OTP.");
+    return;
+  }
+
+  verifiedMobile=mobile;
+  localStorage.setItem("audisankara_customer_mobile", mobile);
+  $("loginOverlay").style.display="none";
+  $("userBadge").textContent="📱 "+mobile;
+  $("userBadge").style.display="inline-block";
+}
+
+function checkExistingLogin(){
+  const mobile=localStorage.getItem("audisankara_customer_mobile");
+  if(mobile && /^[6-9]\d{9}$/.test(mobile)){
+    verifiedMobile=mobile;
+    $("loginOverlay").style.display="none";
+    $("userBadge").textContent="📱 "+mobile;
+    $("userBadge").style.display="inline-block";
+  }
+}
+
 function setDefaultDates(){
   const now=new Date(), end=new Date(now); end.setDate(now.getDate()+2);
   $("startDate").value=now.toISOString().slice(0,10);
   $("endDate").value=end.toISOString().slice(0,10);
 }
 setDefaultDates();
+checkExistingLogin();
 
 function getDays(){
   const s=new Date($("startDate").value),e=new Date($("endDate").value);
